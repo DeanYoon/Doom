@@ -1,0 +1,21 @@
+@import "./variables";
+body {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  #videoChat {
+    display: flex;
+
+    #camBox {
+      display: flex;
+      flex-direction: column;
+    }
+    #chatBox {
+      width: 800px;
+      height: 1000px;
+      border: 1px solid black;
+    }
+  }
+}

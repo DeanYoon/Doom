@@ -1,0 +1,22 @@
+/*!**********************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/public/scss/styles.scss ***!
+  \**********************************************************************************************************************/
+body {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+body #videoChat {
+  display: flex;
+}
+body #videoChat #camBox {
+  display: flex;
+  flex-direction: column;
+}
+body #videoChat #chatBox {
+  width: 800px;
+  height: 1000px;
+  border: 1px solid black;
+}
