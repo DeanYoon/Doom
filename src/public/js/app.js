@@ -6,6 +6,8 @@ const cameraBtn = document.getElementById("camera");
 const camerasSelect = document.getElementById("cameras");
 const micsSelect = document.getElementById("mics");
 const speakersSelect = document.getElementById("speakers");
+const text = document.getElementById("text");
+const hangupBtn = document.getElementById("hangup");
 
 const call = document.getElementById("call");
 call.hidden = true;
@@ -63,7 +65,7 @@ function addOptions(device, devicesSelect) {
 
 async function getMedia(deviceId) {
   const initialConstraints = {
-    audio: true,
+    audio: muted,
     video: { facingMode: "user" },
   };
   const micConstraints = {
@@ -71,7 +73,7 @@ async function getMedia(deviceId) {
     video: true,
   };
   const cameraConstraints = {
-    audio: true,
+    audio: muted,
     video: { deviceId: { exact: deviceId } },
   };
 
@@ -122,12 +124,25 @@ async function handleCameraChange() {
       .getSenders()
       .find((sender) => sender.track.kind === "video");
     videoSender.replaceTrack(videoTrack);
+    cameraOff = false;
+    cameraBtn.innerText = "Turn Off Camera";
   }
 }
 async function handleMicChange() {
   await getMedia(micsSelect.value);
+  if (myPeerConnection) {
+    const audioTrack = myStream.getAudioTracks()[0];
+    const audioSender = myPeerConnection
+      .getSenders()
+      .find((sender) => sender.track.kind === "audio");
+    audioSender.replaceTrack(audioTrack);
+    if (muted) {
+      muteBtn.innerText = "Unmute";
+    } else {
+      muteBtn.innerText = "Mute";
+    }
+  }
 }
-
 muteBtn.addEventListener("click", handleMuteClick);
 cameraBtn.addEventListener("click", handleCameraClick);
 camerasSelect.addEventListener("input", handleCameraChange);
@@ -159,7 +174,9 @@ welcomeForm.addEventListener("submit", handleWelcomeSubmit);
 //peer A
 socket.on("welcome", async () => {
   myDataChannel = myPeerConnection.createDataChannel("chat"); //create data channel
-  myDataChannel.addEventListener("message", (event) => console.log(event.data));
+  myDataChannel.addEventListener("message", (event) =>
+    sendText("Stranger", event.data)
+  );
   console.log("made data channel");
 
   const offer = await myPeerConnection.createOffer();
@@ -173,10 +190,11 @@ socket.on("offer", async (offer) => {
   myPeerConnection.addEventListener("datachannel", (event) => {
     myDataChannel = event.channel;
     myDataChannel.addEventListener("message", (event) =>
-      console.log(event.data)
+      sendText("Stranger", event.data)
     );
   });
   console.log("received the offer");
+
   myPeerConnection.setRemoteDescription(offer);
   const answer = await myPeerConnection.createAnswer();
   myPeerConnection.setLocalDescription(answer);
@@ -212,6 +230,7 @@ function makeConnection() {
   });
   myPeerConnection.addEventListener("icecandidate", handleIce);
   myPeerConnection.addEventListener("addstream", handleAddStream);
+  myPeerConnection.addEventListener("disconnected", handleDisconnected);
   myStream
     .getTracks()
     .forEach((track) => myPeerConnection.addTrack(track, myStream));
@@ -231,3 +250,54 @@ function handleAddStream(data) {
   const peersStream = document.getElementById("peerFace");
   peersStream.srcObject = data.stream;
 }
+function handleDisconnected(event) {
+  console.log(event);
+}
+
+//chatting
+function handleTextSubmit(event) {
+  event.preventDefault();
+  const messageInput = document.getElementById("textInput");
+  if (messageInput.value) {
+    myDataChannel.send(messageInput.value);
+    sendText("You", messageInput.value);
+  }
+  messageInput.value = "";
+}
+function sendText(owner, text) {
+  const chatBox = document.getElementById("chat");
+  const span = document.createElement("span");
+  const spanText = document.createElement("span");
+  const ol = document.createElement("ol");
+  const ul = document.getElementById("chatBox");
+  span.id = owner.toLowerCase();
+
+  spanText.innerText = text;
+  span.innerText = `${owner} : `;
+  ol.appendChild(span);
+  ol.appendChild(spanText);
+  chatBox.appendChild(ol);
+  ul.scrollTop = ul.scrollHeight;
+}
+
+function handleMessage(event) {
+  console.log("message arrived");
+}
+text.addEventListener("submit", handleTextSubmit);
+if (myDataChannel) {
+  myDataChannel.addEventListener("message", handleMessage);
+}
+
+setInterval(() => {
+  console.log(myPeerConnection.iceConnectionState);
+
+  if (myPeerConnection.iceConnectionState === "disconnected") {
+  }
+}, 15000);
+
+function hangup() {
+  myPeerConnection.close();
+  myPeerConnection = null;
+}
+
+hangupBtn.addEventListener("click", hangup);

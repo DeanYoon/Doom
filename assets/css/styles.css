@@ -2,21 +2,60 @@
   !*** css ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src/public/scss/styles.scss ***!
   \**********************************************************************************************************************/
 body {
-  margin-top: 20px;
+  height: 100vh;
+  min-height: 800px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  position: relative;
+}
+body #hangup {
+  position: absolute;
+  right: 0px;
+}
+body #settings {
+  display: flex;
+  justify-content: center;
 }
 body #videoChat {
   display: flex;
+  margin-top: 50px;
+  position: relative;
 }
 body #videoChat #camBox {
   display: flex;
   flex-direction: column;
+  border: 1px solid black;
+  background-color: black;
 }
 body #videoChat #chatBox {
-  width: 800px;
-  height: 1000px;
+  width: 50vw;
+  height: 600px;
   border: 1px solid black;
+  overflow-y: scroll;
+}
+body #videoChat #chatBox ul {
+  margin-left: 0;
+  padding: 0;
+}
+body #videoChat #chatBox ul ol {
+  margin-left: 0;
+  padding: 0;
+  padding-left: 5px;
+  font-size: 20px;
+}
+body #videoChat #chatBox ul ol #stranger {
+  color: red;
+}
+body #videoChat #chatBox #textInput {
+  position: absolute;
+  bottom: 0px;
+  width: 50vw;
+}
+body #videoChat #chatBox button {
+  position: absolute;
+  bottom: 0px;
+  right: 0;
 }

@@ -16,16 +16,23 @@ html(lang="en")
                     input(placeholder="rom name", required, type="text")
                     button Enter room
             div#call
+                button#hangup hangup
                 div#myStream
-                    button#mute Mute
-                    button#camera Turn Off Cam
-                    select#cameras
-                    select#mics
+                    div#settings
+                        button#mute Mute
+                        button#camera Turn Off Cam
+                        select#cameras
+                        select#mics
+                        select#speakers
                     div#videoChat
                         div#camBox
-                            video#myFace(autoplay,playsinline, width="400", height="400")
-                            video#peerFace(autoplay,playsinline, width="400", height="400")
-                        div#chatBox
+                            video#myFace(autoplay,playsinline, width="400", height="300")
+                            video#peerFace(autoplay,playsinline, width="400", height="300")
+                        div#chatBox(ondrop="dropHandler(event);")
+                            ul#chat
+                            form(autocomplete="off")#text
+                                input(type='text')#textInput
+                                button Send
         script(src="/socket.io/socket.io.js")
         script(src="/public/js/app.js")
         script(src="/static/js/main.js")
